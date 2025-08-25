@@ -1,0 +1,75 @@
+# name: Databricks CI/CD
+
+# on:
+#   # Roda o workflow em pushes para a branch main e em pull requests
+#   push:
+#     branches:
+#       - main
+#   pull_request:
+
+# # env:
+# #   USER_EMAIL: ${{ secrets.USER_EMAIL }} -- ${USER_EMAIL}
+# #   DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }} -- ${DATABRICKS_HOST}
+# #   DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }} -- ${DATABRICKS_TOKEN}
+
+# jobs:
+#   # O nome do job é deploy
+#   # Roda numa imagem ubuntu
+#   # Cada step é como se fosse uma task em um job do Databricks
+#   deploy:
+#     runs-on: ubuntu-latest
+
+#     steps:
+#       # Actions são tasks pré-definidas e que facilitam o uso. São como modules no Terraform.
+#       # A action de checkout clona o repositório para dentro do container
+#       - name: Checkout repo
+#         uses: actions/checkout@v4
+
+#       - name: Set up Python
+#         uses: actions/setup-python@v5
+#         with:
+#           python-version: "3.11"
+
+#       - name: Install uv (for building wheel)
+#         run: pip install uv
+
+#       - name: Install Databricks CLI
+#         run: pip install databricks-cli
+
+#       # Necessário passar essas credenciais como secrets a nível do repositório, workflow ou conta.
+#       # A nível de repositório: Repositório -> Settings -> Secrets and variables. O acesso é via ${{ secrets.NOME_DO_SECRET}}
+      
+#       - name: Set environment variables
+#         run: |
+#           echo "DATABRICKS_HOST=${{ secrets.DATABRICKS_HOST }}" >> $GITHUB_ENV
+#           echo "DATABRICKS_TOKEN=${{ secrets.DATABRICKS_TOKEN }}" >> $GITHUB_ENV
+      
+#       - name: Deploy to dev
+#         env:
+#           DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
+#           DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
+#         run: |
+#           databricks bundle deploy --target dev
+
+#       # - name: Run tests in dev (if you have notebooks/tests)
+#       #   env:
+#       #     DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
+#       #     DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
+#       #   run: |
+#       #     databricks bundle run integration_tests --target dev
+
+#       - name: Destroy dev
+#         if: success()
+#         env:
+#           DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
+#           DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
+#         run: |
+#           databricks bundle destroy --target dev --force
+
+#       - name: Deploy to prod
+#         if: success()
+#         env:
+#           DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST_PROD }}
+#           DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN_PROD }}
+#         run: |
+#           databricks bundle deploy --target prod

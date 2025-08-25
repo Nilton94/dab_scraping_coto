@@ -1,0 +1,37 @@
+resources:
+  jobs:
+    # Cada job por ter várias tasks
+    scraping_coto_job:
+      name: scraping_coto_job
+
+      trigger:
+        periodic:
+          interval: 1
+          unit: DAYS
+
+      email_notifications:
+       on_failure:
+         - ${USER_EMAIL}
+
+      # Task para validar se os volumes e catálogos existem
+      tasks:
+        - task_key: validate_volumes
+          notebook_task:
+            notebook_path: ../src/check_volumes.ipynb
+            base_parameters:
+              target: ${bundle.target}
+              source_path: ${workspace.file_path}/src
+
+        - task_key: load_staging_data
+          depends_on:
+            - task_key: validate_volumes
+          notebook_task:
+            notebook_path: ../src/load_staging.ipynb
+
+      # A list of task execution environment specifications that can be referenced by tasks of this job.
+      environments:
+        - environment_key: default
+          spec:
+            client: "2"
+            dependencies:
+              - ../dist/*.whl

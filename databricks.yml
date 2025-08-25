@@ -1,0 +1,32 @@
+# Definição do bundle. como é gerado o uuid?
+bundle:
+  name: scraping_coto
+  uuid: 778ca83e-a47f-4c4e-8bc3-4abac2d593d6
+
+# Definição de artefatos, como pacotes
+artifacts:
+  python_artifact:
+    type: whl
+    build: uv build --wheel
+
+# Inclusão dos recursos
+# Também é possível usar a key resources e construir os recursos aqui, como jobs, pipelines, etc.
+include:
+  - resources/*.yml
+  - resources/*/*.yml
+
+targets:
+  dev:
+    mode: development
+    default: true
+    workspace:
+      host: ${DATABRICKS_HOST}
+
+  prod:
+    mode: production
+    workspace:
+      host: ${DATABRICKS_HOST}
+      root_path: /Workspace/Users/${USER_EMAIL}/.bundle/${bundle.name}/${bundle.target}
+    permissions:
+      - user_name: ${USER_EMAIL}
+        level: CAN_MANAGE

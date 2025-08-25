@@ -1,0 +1,43 @@
+[project]
+name = "scraping_coto"
+version = "0.0.1"
+authors = [{ name = "josenilton1878@gmail.com" }]
+requires-python = ">= 3.11"
+dependencies = [
+    "aiohttp>=3.12.15",
+    "dotenv>=0.9.9",
+    "ipykernel>=6.30.1",
+    "logfire>=4.3.3",
+    "polars>=1.32.3",
+    "pydantic>=2.11.7",
+    "pytz>=2025.2",
+    "random-user-agent>=1.0.1",
+    "requests>=2.32.4",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest",
+]
+
+[tool.pytest.ini_options]
+pythonpath = "src"
+testpaths = [
+    "tests",
+]
+
+[build-system]
+requires = ["uv_build>=0.8.11"]
+build-backend = "uv_build"
+
+[dependency-groups]
+dev = [
+    "pandas>=2.3.1",
+    "pytest>=8.4.1",
+]
+
+[tool.uv.sources]
+scraping_coto = { path = "src/scraping_coto" }
+
+[project.scripts]
+main = "scraping_coto.main:main"
