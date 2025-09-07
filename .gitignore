@@ -9,3 +9,4 @@ scratch/**
 .env
 COMANDOS.MD
 resources/*.txt
+.logfire

@@ -7,6 +7,9 @@ import polars as pl
 import polars.selectors as cs
 from dataclasses import dataclass
 from ...utils.literals import URLTYPE
+from ...utils.logger import get_logger
+
+logger = get_logger()
 
 @dataclass
 class CotoScraper:
@@ -30,6 +33,7 @@ class CotoScraper:
         '''
 
         try:
+            logger.info(f'Starting requests for url {self.url}!')
             r = requests.get(url = self.url, headers = self.headers)
             json_response = json.loads(r.text)
 
@@ -42,9 +46,10 @@ class CotoScraper:
                     "headers": self.headers
                 }
             )
-
+            logger.info(f'Success loading data from url {self.url}!')
             return json_response
         except Exception as e:
+            logger.info(f'Error loading data from url {self.url}!\n{e}')
             return f'Erro: {e}'
         
     def parse_base_json(self):
@@ -57,7 +62,8 @@ class CotoScraper:
             Returns:
                 list: A list of dictionaries containing department, category, subcategory details, and URLs.
         '''
-        
+        logger.info(f'Starting parsing department json file')
+
         df = self.get_general_urls()
         
         data = [
@@ -82,6 +88,7 @@ class CotoScraper:
             for subcat in cat.get('subCategories2', [])
         ]
 
+        logger.info(f'Success parsing {len(data)} collections from department json file!')
         return data
         
 
@@ -105,6 +112,7 @@ class CotoScraperTotalItems(CotoScraper):
 
         extend_url = f"https://api.cotodigital.com.ar/sitios/cdigi/{url}?&format=json&pushSite=CotoDigital"
         
+        logger.info(f'Starting requests for url {url}!')
         try:
             async with session.get(extend_url) as response:
                 
@@ -123,11 +131,15 @@ class CotoScraperTotalItems(CotoScraper):
                     }
                 )
 
-        except:
+                logger.info(f'Sucesses loading data from url {url} with status code {response.status}!')
+
+        except Exception as e:
                 try:
                     status_code = response.status
-                except Exception as e:
-                    status_code = f'Erro: {e}'
+                except:
+                    status_code = 404
+
+                logger.error(f'Error loading data from url {url} with status code {status_code}!\n{e}')
 
                 results = {
                     f'{prefix}_id': id,
@@ -152,6 +164,7 @@ class CotoScraperTotalItems(CotoScraper):
             Returns:
                 list[dict]: A list of dictionaries containing the id, name, url, extended url, number of items, and other metadata.
         '''
+        logger.info(f'Starting processing total items from {prefix}!')
 
         try:
             df = self.parse_base_json()
@@ -166,8 +179,11 @@ class CotoScraperTotalItems(CotoScraper):
                 html_pages = await asyncio.gather(*tasks)
                 results.extend(html_pages)
             
+            # logger.info(f'Success processing {len(results)} items from {prefix}!')
+
             return results
         except Exception as e:
+            logger.error(f'Error loading total items for {prefix}!\n{e}')
             return f'Erro: {e}'
         
 
@@ -182,13 +198,13 @@ class CotoScraperTotalItems(CotoScraper):
                 list: A list of dictionaries containing the id, name, url, extended url, number of items, and other metadata.
         '''
         
-        
+        logger.info(f'Starting parsing {prefix} json!')
+
         data = await self.get_total_items(prefix=prefix)
         
         results = []
         
         for row in data:
-            
             try:
                 index = [idx for idx, row in enumerate(row['contents'][0]['Main']) if 'contents' in row.keys()][0]
                 items = row['contents'][0]['Main'][index]['contents'][0]['totalNumRecs']
@@ -207,9 +223,12 @@ class CotoScraperTotalItems(CotoScraper):
                     "status_code": row['status_code']
                 }
 
+                logger.info(f'[{prefix}] - sucess processing item {row[f"{prefix}_name"]} with status code {row["status_code"]}')
                 results.append(item)
             
-            except:
+            except Exception as e:
+                logger.error(f'[{prefix}] - error processing item!\n{e}')
+
                 item =  {
                     f'{prefix}_id': row[f'{prefix}_id'],
                     f'{prefix}_name': row[f'{prefix}_name'],
@@ -225,5 +244,84 @@ class CotoScraperTotalItems(CotoScraper):
                 }
 
                 results.append(item)
+
+        logger.info(f'Finish processing {len(results)} collections from {prefix}!')
+        return results
+    
+
+class CotoScraperItems(CotoScraperTotalItems):
+    
+    async def __get_item_async_info(self, session: aiohttp.ClientSession, id: str, url: str):
+        try:
+            async with session.get(url) as response:
+                
+                logger.info(f'[{id}] - Getting data from {url}!')
+
+                results = json.loads(await response.text())
+                
+                results.update(
+                    {
+                        'id': id,
+                        'url': url,
+                        'timestamp': str(datetime.datetime.now(tz=self.default_tz)),
+                        'timezone': self.default_tz.zone,
+                        'status_code': response.status
+                    }
+                )
+
+                logger.info(f'[{id}] - Data loaded from {url} with status code {response.status}!')
+
+        except Exception as e:
+                try:
+                    status_code = response.status
+                except:
+                    status_code = 404
+
+                logger.error(f'[{id}] - Error getting data from {url}, status code {status_code}!\n{e}')
+
+                results = {
+                    'id': id,
+                    'url': url,
+                    'timestamp': str(datetime.datetime.now(tz=self.default_tz)),
+                    'timezone': self.default_tz.zone,
+                    'status_code': status_code
+                }
         
         return results
+    
+    async def get_items_info(self):
+
+        
+        try:
+            logger.info(f'Starting async information extraction from items!')
+            data = await self.parse_item_json(prefix='subcategory')
+            adjusted_data = [
+                {
+                    'id': item['subcategory_id'], 
+                    'urls': [url for url in item['subcategory_final_url']]
+                }
+                for item in data
+                if all(
+                    [
+                        item['subcategory_final_url'] != None, 
+                        item['subcategory_final_url'] != []
+                    ]
+                )
+            ]
+
+            results = []
+            async with aiohttp.ClientSession(headers = self.headers) as session:
+                tasks = [
+                    self.__get_item_async_info(session = session, id = row['id'], url = url)
+                    for row in adjusted_data
+                    for url in row['urls']
+                ]
+                response = await asyncio.gather(*tasks)
+                results.extend(response)
+
+            logger.info(f'Succesfully loaded informations from {len(results)} items!')
+
+            return results
+        except Exception as e:
+            logger.error(f'Error when tried to load information from items!\n{e}')
+            return f'Erro: {e}'

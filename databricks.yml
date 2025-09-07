@@ -19,13 +19,13 @@ targets:
   dev:
     mode: development
     default: true
-    workspace:
-      host: ${DATABRICKS_HOST}
+    # workspace:
+      # host: ${env.DATABRICKS_HOST}
 
   prod:
     mode: production
     workspace:
-      host: ${DATABRICKS_HOST}
+      # host: ${env.DATABRICKS_HOST}
       root_path: /Workspace/Users/${USER_EMAIL}/.bundle/${bundle.name}/${bundle.target}
     permissions:
       - user_name: ${USER_EMAIL}

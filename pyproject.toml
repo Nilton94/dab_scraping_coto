@@ -7,12 +7,14 @@ dependencies = [
     "aiohttp>=3.12.15",
     "dotenv>=0.9.9",
     "ipykernel>=6.30.1",
-    "logfire>=4.3.3",
+    "logfire[requests,system-metrics]>=4.3.3",
     "polars>=1.32.3",
     "pydantic>=2.11.7",
+    "python-dotenv[cli]>=1.1.1",
     "pytz>=2025.2",
     "random-user-agent>=1.0.1",
     "requests>=2.32.4",
+    "taskipy>=1.14.1",
 ]
 
 [project.optional-dependencies]
@@ -38,6 +40,16 @@ dev = [
 
 [tool.uv.sources]
 scraping_coto = { path = "src/scraping_coto" }
+
+[tool.taskipy.tasks]
+databricks-bundle = "python -m dotenv run -- databricks bundle"
+bundle-validate = "python -m dotenv run -- databricks bundle validate"
+bundle-deploy = "python -m dotenv run -- databricks bundle deploy"
+bundle-deploy-dev = "python -m dotenv run -- databricks bundle deploy --target dev"
+
+[tool.logfire]
+project_name = "dab-scraping-coto"
+config_dir = "/.logfire
 
 [project.scripts]
 main = "scraping_coto.main:main"

@@ -22,6 +22,7 @@ def get_logger(name: str = __name__, level: Literal["debug","info","warning","er
     
     logfire.configure(
         token=os.environ['LOGFIRE_TOKEN'],
+        # config_dir="~/scraping_coto",
         # pydantic_plugin=logfire.PydanticPlugin(record='all'), # dados de validação do pydantic - Deprecado
         console = False # Evita printar no console, já que para isso temos o StreamHandler
     )

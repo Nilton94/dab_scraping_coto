@@ -1,6 +1,9 @@
 import json
-from .literals import JSONMODE
+import os
+import re
+from .literals import JSONMODE, READMODE, FOLDERTYPE
 import datetime, pytz
+# from pathlib import Path
 
 def flatten_json(json: json = None, search_key = None, search_item = None, list_length = None):
     
@@ -61,5 +64,40 @@ def loader(file: json = None, file_path: str = None, file_name: str = None, mode
                 data = json.dumps(obj=file, ensure_ascii=False, indent=4)
                 f.write(data)
             
+    except Exception as e:
+        return f'Error: {e}'
+    
+def reader(file_folder: str = None, read_mode: READMODE = 'last date', folder_type: FOLDERTYPE = 'departments'):
+    '''
+        Function to read json files
+
+        Args:
+            file_folder: path to read the json files
+            read_mode: read mode, default is 'last date'
+
+        Returns:
+            json: json object or error message
+    '''
+
+    DATE_REGEX = r'[0-9]{4}-[0-9]{2}-[0-9]{2}'
+    list_files = os.listdir(file_folder) if file_folder else os.listdir('./')
+    last_date = [re.compile(DATE_REGEX).match(file) for file in list_files]
+    last_date.sort(reverse=True)
+
+    try:
+        if read_mode == 'last date':
+            file_path = f'{file_folder}/{last_date[0]}_{folder_type}.json'
+
+            with open(file_path, 'r') as f:
+                data = json.load(f)
+
+        else:
+            data = []
+            for file in list_files:
+                with open(f'{file_folder}/{file}', 'r') as f:
+                    data.append(json.load(f))
+
+        return data
+    
     except Exception as e:
         return f'Error: {e}'
