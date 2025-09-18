@@ -1,9 +1,13 @@
 import os
 import logging
 from typing import Literal
-from logging.handlers import RotatingFileHandler
 from dotenv import load_dotenv
 import logfire
+from .dbutils import get_dbutils
+
+dbutils = get_dbutils()
+# token = dbutils.widgets.get("LOGFIRE_TOKEN")
+token = dbutils.secrets.get(scope = "logfire", key = "token")
 load_dotenv()
 
 def get_logger(name: str = __name__, level: Literal["debug","info","warning","error","critical"] = "info") -> logging.Logger:
@@ -21,12 +25,13 @@ def get_logger(name: str = __name__, level: Literal["debug","info","warning","er
     """
     
     logfire.configure(
-        token=os.environ['LOGFIRE_TOKEN'],
+        # token=os.environ['BUNDLE_VAR_LOGFIRE_TOKEN'],
+        token=token,
         # config_dir="~/scraping_coto",
         # pydantic_plugin=logfire.PydanticPlugin(record='all'), # dados de validação do pydantic - Deprecado
         console = False # Evita printar no console, já que para isso temos o StreamHandler
     )
-    logfire.instrument_pydantic()
+    # logfire.instrument_pydantic()
     logfire.instrument_requests()
     logfire.instrument_system_metrics()
 
@@ -89,14 +94,14 @@ def get_logger(name: str = __name__, level: Literal["debug","info","warning","er
         logger.addHandler(logfire_handler)
 
         # Arquivo com rotação - Limita o tamanho do arquivo a 1MB e mantém 5 backups
-        file_handler = RotatingFileHandler(
-            log_file_path,
-            maxBytes=1_000_000,
-            backupCount=5,
-            encoding='utf-8'
-        )
-        file_handler.setFormatter(formatter)
-        file_handler.setLevel(log_level)
-        logger.addHandler(file_handler)
+        # file_handler = RotatingFileHandler(
+        #     log_file_path,
+        #     maxBytes=1_000_000,
+        #     backupCount=5,
+        #     encoding='utf-8'
+        # )
+        # file_handler.setFormatter(formatter)
+        # file_handler.setLevel(log_level)
+        # logger.addHandler(file_handler)
 
     return logger

@@ -9,11 +9,19 @@ artifacts:
     type: whl
     build: uv build --wheel
 
+# Especifica as variáveis e suas definições. Para usá-las, basta passar BUNDLE_VAR_{nome_var} nas variáveis de ambiente
+variables:
+  LOGFIRE_TOKEN:
+    description: "The Logfire API token for logging."
+
 # Inclusão dos recursos
 # Também é possível usar a key resources e construir os recursos aqui, como jobs, pipelines, etc.
 include:
   - resources/*.yml
   - resources/*/*.yml
+
+experimental:
+  python_wheel_wrapper: true
 
 targets:
   dev:
