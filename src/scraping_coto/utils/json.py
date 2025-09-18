@@ -3,7 +3,9 @@ import os
 import re
 from .literals import JSONMODE, READMODE, FOLDERTYPE
 import datetime, pytz
-# from pathlib import Path
+from .logger import get_logger
+
+logger = get_logger()
 
 def flatten_json(json: json = None, search_key = None, search_item = None, list_length = None):
     
@@ -56,6 +58,8 @@ def loader(file: json = None, file_path: str = None, file_name: str = None, mode
     file_name = file_name if file_name else 'data'
     file_path_final = f'{file_path}/{dt_str}_{file_name}.json'
 
+    logger.info(f'Starting json loader to {file_path_final}!')
+
     try:
         with open(file_path_final, mode) as f:
             try:
@@ -63,9 +67,12 @@ def loader(file: json = None, file_path: str = None, file_name: str = None, mode
             except:
                 data = json.dumps(obj=file, ensure_ascii=False, indent=4)
                 f.write(data)
+
+            logger.info(f'Finished json loader to {file_path_final}!')
             
     except Exception as e:
-        return f'Error: {e}'
+        logger.info(f'Error loading json to {file_path_final}!')
+        raise Exception(f'Error: {e}')
     
 def reader(file_folder: str = None, read_mode: READMODE = 'last date', folder_type: FOLDERTYPE = 'departments'):
     '''
