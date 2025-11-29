@@ -13,6 +13,17 @@ logger = get_logger()
 
 @dataclass
 class CotoScraper:
+    """
+        Scraper class to extract URLs and related data from the Coto groceries website.
+        Args:
+            self: Instance of the CotoScraper class.
+        Returns:
+            None
+        Methods:
+            - get_general_urls: Retrieve general data from the main page of the Coto website.
+            - parse_base_json: Parse the JSON response to extract department, category, and subcategory information along with URLs.
+    """
+    
     url = 'https://api.cotodigital.com.ar/sitios/cdigi/categoria?&format=json&pushSite=CotoDigital'
     url_template = 'https://api.cotodigital.com.ar/sitios/cdigi/'
     url_params = {'general':'categoria?&format=json&pushSite=CotoDigital', 'items':'{category_path}?_No={page_number}&Nrpp={number_per_page}&format=json&pushSite=CotoDigital'}
@@ -94,20 +105,33 @@ class CotoScraper:
 
 @dataclass
 class CotoScraperTotalItems(CotoScraper):
+    """ 
+        Scraper class to extract total items from departments, categories, and subcategories from the Coto groceries website.
+        Inherits from CotoScraper.
+        Args:
+            self: Instance of the CotoScraperTotalItems class.
+        Returns:
+            None
+        Methods:
+            - get_total_items: Retrieve total number of items for each department, category, or subcategory.
+            - parse_item_json: Parse the JSON response to extract the total number of items for each department, category, or subcategory.
+            - __get_page_async_info: Helper method to retrieve website data asynchronously from a given URL.
+    """
 
     async def __get_page_async_info(self, session: aiohttp.ClientSession, id: str, name: str, url: str, prefix: URLTYPE) -> dict:
         '''
-            General function to retrieve website data asynchronously from a given URL.
-
-            Params:
-                session: aiohttp session
-                id: department/category/subcategory id
-                name: department/category/subcategory name
-                url: department/category/subcategory url
-                prefix: department, category or subcategory
-
+            Helper method to retrieve website data asynchronously from a given URL.
+            Args:
+                session (aiohttp.ClientSession): Active aiohttp session.
+                id (str): Identifier for the department/category/subcategory.
+                name (str): Name of the department/category/subcategory.
+                url (str): URL associated with the department/category/subcategory.
+                prefix (URLTYPE): Prefix indicating the type (department, category, or subcategory).
             Returns:
-                dict: A dictionary containing the id, name, url, extended url, number of items, and other metadata.
+                dict: A dictionary containing the JSON response along with metadata.
+            Example:
+                >>> async with aiohttp.ClientSession(headers = self.headers) as session:
+                >>>     result = await self.__get_page_async_info(session, id="123", name="Beverages", url="beverages", prefix="category")
         '''
 
         extend_url = f"https://api.cotodigital.com.ar/sitios/cdigi/{url}?&format=json&pushSite=CotoDigital"
@@ -163,7 +187,11 @@ class CotoScraperTotalItems(CotoScraper):
             
             Returns:
                 list[dict]: A list of dictionaries containing the id, name, url, extended url, number of items, and other metadata.
+                str: Error message in case of failure.
+            Example:
+                >>> data = await CotoScraperTotalItems().get_total_items(prefix='category')
         '''
+
         logger.info(f'Starting processing total items from {prefix}!')
 
         try:
@@ -196,6 +224,9 @@ class CotoScraperTotalItems(CotoScraper):
 
             Returns:
                 list: A list of dictionaries containing the id, name, url, extended url, number of items, and other metadata.
+
+            Example:
+                >>> data = await CotoScraperTotalItems().parse_item_json(prefix='subcategory')
         '''
         
         logger.info(f'Starting parsing {prefix} json!')
@@ -250,8 +281,31 @@ class CotoScraperTotalItems(CotoScraper):
     
 
 class CotoScraperItems(CotoScraperTotalItems):
-    
+    """ 
+        Scraper class to extract detailed information from each item in subcategories from the Coto groceries website.
+        Inherits from CotoScraperTotalItems.
+        Args:
+            self: Instance of the CotoScraperItems class.
+        Returns:
+            None
+        Methods:
+            - __get_item_async_info: Helper method to retrieve item data asynchronously from a given URL.
+            - get_items_info: Retrieve detailed information for each item in the subcategories.
+    """
     async def __get_item_async_info(self, session: aiohttp.ClientSession, id: str, url: str):
+        """ 
+            Helper method to retrieve item data asynchronously from a given URL.
+            Args:
+                session (aiohttp.ClientSession): The aiohttp client session to use for the request.
+                id (str): The identifier for the item.
+                url (str): The URL to fetch the item data from.
+            Returns:
+                dict: The JSON response containing the item data, along with metadata.
+            Example:
+                >>> async with aiohttp.ClientSession(headers = self.headers) as session:
+                >>>     result = await self.__get_item_async_info(session, id="123", url="subcategory/123?_No=0&Nrpp=999&format=json")
+        """
+        
         try:
             async with session.get(url) as response:
                 
@@ -290,7 +344,17 @@ class CotoScraperItems(CotoScraperTotalItems):
         return results
     
     async def get_items_info(self):
-
+        """ 
+            Retrieve detailed information for each item in the subcategories.
+            Args:
+                self: Instance of the CotoScraperItems class.
+            Returns:
+                list: A list of dictionaries containing detailed information for each item.
+            Raises:
+                Exception: If there is an error during the data retrieval process.
+            Example:
+                >>> data = await CotoScraperItems().get_items_info()
+        """
         
         try:
             logger.info(f'Starting async information extraction from items!')

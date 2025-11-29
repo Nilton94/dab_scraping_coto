@@ -10,7 +10,19 @@ dbutils = get_dbutils()
 logger = get_logger()
 
 async def load_to_bronze(spark: SparkSession, type: URLTYPE = 'department', catalog: str = 'main', schema: str = 'default', table: str = 'test'):
-    
+    """ 
+        Load data from CotoScraper into a Bronze table in the specified catalog, schema, and table.
+        Args:
+            spark (SparkSession): Active Spark session.
+            type (URLTYPE): Type of URL to load ('department', 'category', or 'subcategory').
+            catalog (str): Target catalog.
+            schema (str): Target schema.
+            table (str): Target table name.
+        Returns:
+            None
+        Example:
+            >>> await load_to_bronze(spark, type='department', catalog='main', schema='default', table='departments')
+    """
     if type not in ['department','category','subcategory']:
         return 'Error: type must be department, category or subcategory'
     
@@ -69,6 +81,11 @@ def volumes_to_bronze(spark: SparkSession, type: FOLDERTYPE = "departments", cat
             volume (str): Source volume name.
             file_format (str): File format in the volume (json, parquet, csv...).
             mode (str): Write mode for the table ("append" or "overwrite").
+        Returns:
+            None
+        Example:
+            >>> volumes_to_bronze(spark, type="departments", catalog="main", schema="default", table="departments_bronze", volume="staging", file_format="json", mode="append")
+            >>> volumes_to_bronze(spark, type="categories", catalog="main", schema="default", table="categories_bronze", volume="staging", file_format="parquet", mode="
     """
 
     logger.info(f"Starting saving data for table {catalog}.{schema}.{table}!")
@@ -100,6 +117,7 @@ def volumes_to_bronze(spark: SparkSession, type: FOLDERTYPE = "departments", cat
             df.writeStream
             .format("delta")
             .option("checkpointLocation", checkpoint_path)
+            .option("delta.enableChangeDataFeed", "true")
             .trigger(once=True)
             .table(f"{catalog}.{schema}.{table}")
         )

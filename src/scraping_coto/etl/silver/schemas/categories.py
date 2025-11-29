@@ -1,7 +1,13 @@
 from pyspark.sql.types import *
 
 def category_schema():
+    """ 
+        Define the schema for category data.
 
+        Returns:
+            ArrayType: Schema for category data.
+    """
+    
     cat_schema = ArrayType(
         StructType([
             StructField("@type", StringType(), True),

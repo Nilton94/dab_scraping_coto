@@ -6,6 +6,7 @@ def get_spark() -> SparkSession:
     """
     
     try:
+        # session = SparkSession.getActiveSession()
         from databricks.connect import DatabricksSession
         return DatabricksSession.builder.getOrCreate()
     

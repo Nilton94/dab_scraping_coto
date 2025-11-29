@@ -1,7 +1,12 @@
 from pyspark.sql.types import *
 
 def department_schema():
-
+    """
+        Define the schema for department data.
+        Returns:
+            ArrayType: Schema for department data.
+    """
+    
     audit_info = StructType([
         StructField("ecr:innerPath", StringType(), True),
         StructField("ecr:resourcePath", StringType(), True),
