@@ -1,6 +1,11 @@
 from pyspark.sql.types import *
 
 def items_main_schema():
+    """
+        Define the schema for items data.
+        Returns:
+            ArrayType: Schema for items data.
+    """
 
     items_schema = ArrayType(StructType([
         StructField("@type", StringType(), True),
@@ -823,7 +828,12 @@ def items_main_schema():
     return items_schema
 
 def items_site_schema():
-
+    """
+        Define the schema for item site state data.
+        Returns:
+            StructType: Schema for item site state data.
+    """ 
+    
     site_state_schema = StructType([
         StructField("@class", StringType(), True),
         StructField("contentPath", StringType(), True),
