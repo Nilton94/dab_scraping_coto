@@ -1,10 +1,10 @@
-from ...utils.json import reader
-from ...utils.literals import URLTYPE, FOLDERTYPE
+from modules.utils.json import reader
+from modules.utils.literals import URLTYPE, FOLDERTYPE
 from ..staging.extract_urls import CotoScraperTotalItems, CotoScraper
 from pyspark.sql import SparkSession
-from ...utils.logger import get_logger
+from modules.utils.logger import get_logger
 from pyspark.sql.functions import *
-from ...utils.dbutils import get_dbutils
+from modules.utils.dbutils import get_dbutils
 
 dbutils = get_dbutils()
 logger = get_logger()

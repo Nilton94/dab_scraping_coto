@@ -10,3 +10,5 @@ scratch/**
 COMANDOS.MD
 resources/*.txt
 .logfire
+.vscode
+bundle_schema.json

@@ -1,0 +1,95 @@
+targets:
+  dev:
+    resources:
+      jobs:
+        scraping_coto_job:
+          parameters:
+            - name: catalog
+              default: coto_${bundle.target}
+
+  prod:
+    resources:
+      jobs:
+        scraping_coto_job:
+          parameters:
+            - name: catalog
+              default: coto
+          schedule:
+            quartz_cron_expression: "0 0 9 * * ?"
+            timezone_id: "America/Sao_Paulo"
+            pause_status: "UNPAUSED"
+
+
+resources:
+  jobs:
+    scraping_coto_job:
+      name: scraping_coto_job
+
+      email_notifications:
+       on_failure:
+        - ${workspace.current_user.userName}        
+      
+      parameters: 
+        - name: target
+          default: ${bundle.target}
+        - name: source_path
+          default: ${workspace.file_path}/src
+        - name: tables_to_process
+          default: "departments,categories,subcategories,items"
+
+      performance_target: PERFORMANCE_OPTIMIZED
+      
+      tasks:
+        - task_key: validate_volumes
+          description: "Valida se os volumes e catálogos existem"
+          notebook_task:
+            notebook_path: ../../src/scraping_coto/00_check_volumes.ipynb
+
+        - task_key: load_staging_data
+          description: "Carrega dados nos volumes de staging dentro do schema Bronze"
+          depends_on:
+            - task_key: validate_volumes
+          notebook_task:
+            notebook_path: ../../src/scraping_coto/01_load_staging.ipynb
+          # libraries: ${var.scraping_coto_job_libraries}
+          environment_key: scraping_coto_serverless_environment
+        
+        - task_key: staging_to_bronze
+          description: "Transforma dados da camada de staging para bronze"
+          depends_on:
+            - task_key: load_staging_data
+          notebook_task:
+            notebook_path: ../../src/scraping_coto/02_staging_to_bronze.ipynb
+          environment_key: scraping_coto_serverless_environment
+
+        - task_key: bronze_to_silver
+          description: "Transforma dados da camada bronze para silver"
+          depends_on:
+            - task_key: staging_to_bronze
+          notebook_task:
+            notebook_path: ../../src/scraping_coto/03_bronze_to_silver.ipynb
+          environment_key: scraping_coto_serverless_environment
+        
+        - task_key: silver_to_gold
+          description: "Transforma dados da camada silver para gold"
+          depends_on:
+            - task_key: bronze_to_silver
+          notebook_task:
+            notebook_path: ../../src/scraping_coto/04_silver_to_gold.ipynb
+            base_parameters:
+              source_catalog_name: coto
+              source_schema_name: silver
+              source_table_name: items
+              target_catalog_name: coto
+              target_schema_name: gold
+              target_table_name: items  
+              partition_by: dt
+              mode: append
+              date_column: dt
+          environment_key: scraping_coto_serverless_environment
+
+      environments:
+        - environment_key: scraping_coto_serverless_environment
+          spec:
+            environment_version: "4"
+            dependencies: ${var.scraping_coto_job_serverless_libraries}

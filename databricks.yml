@@ -1,40 +1,54 @@
-# Definição do bundle. como é gerado o uuid?
+# Definição do bundle
 bundle:
   name: scraping_coto
   uuid: 778ca83e-a47f-4c4e-8bc3-4abac2d593d6
+  databricks_cli_version: ">=0.276.0"
 
 # Definição de artefatos, como pacotes
 artifacts:
   python_artifact:
     type: whl
     build: uv build --wheel
+  # teste:
+  #   build: echo "Teste de build de artefato ${bundle.target}" > teste.txt  
+
+# python: 
+#   mutators:
+#     - 'mutators.configs:add_email_notifications'
+#     - 'mutators.configs:set_job_run_as_identity'
+#     - 'mutators.configs:set_pipeline_run_as_identity'
+#     - 'mutators.guardrails.cluster.pipelines:enforce_dev_cluster_limits'
+#     - 'mutators.guardrails.cluster.jobs:enforce_dev_cluster_limits'
+#     - 'mutators.guardrails.schedule.pipelines:disable_pipeline_schedules_in_dev'
+#     - 'mutators.guardrails.schedule.jobs:disable_job_schedules_in_dev'
+  # resources:
+  #   - 'resources:load_resources'
 
 # Especifica as variáveis e suas definições. Para usá-las, basta passar BUNDLE_VAR_{nome_var} nas variáveis de ambiente
-variables:
-  LOGFIRE_TOKEN:
-    description: "The Logfire API token for logging."
+# variables:
+#   LOGFIRE_TOKEN:
+#     description: "The Logfire API token for logging."
 
 # Inclusão dos recursos
 # Também é possível usar a key resources e construir os recursos aqui, como jobs, pipelines, etc.
 include:
   - resources/*.yml
   - resources/*/*.yml
-
-experimental:
-  python_wheel_wrapper: true
+  - resources/*.yaml
+  - resources/*/*.yaml
 
 targets:
   dev:
     mode: development
     default: true
-    # workspace:
+    workspace:
       # host: ${env.DATABRICKS_HOST}
 
   prod:
     mode: production
     workspace:
       # host: ${env.DATABRICKS_HOST}
-      root_path: /Workspace/Users/${USER_EMAIL}/.bundle/${bundle.name}/${bundle.target}
+      root_path: /Workspace/Users/${workspace.current_user.userName}/.bundle/${bundle.name}/${bundle.target}
     permissions:
-      - user_name: ${USER_EMAIL}
+      - user_name: ${workspace.current_user.userName}
         level: CAN_MANAGE

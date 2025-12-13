@@ -1,0 +1,128 @@
+[
+  {
+    "category": "Ofertas",
+    "full_attribute": "productosnl.asp?TM=CM",
+    "category_nl": null,
+    "category_url": "https://www.lagallega.com.ar/productosnl.asp?pg=1&nl=&TM=CM"
+  },
+  {
+    "category": "almacen",
+    "full_attribute": "productosnl.asp?nl=03&TM=CO",
+    "category_nl": "03",
+    "category_url": "https://www.lagallega.com.ar/productosnl.asp?pg=1&nl=03000000"
+  },
+  {
+    "category": "electro",
+    "full_attribute": "productosnl.asp?nl=04&TM=CO",
+    "category_nl": "04",
+    "category_url": "https://www.lagallega.com.ar/productosnl.asp?pg=1&nl=04000000"
+  },
+  {
+    "category": "bazar / hogar",
+    "full_attribute": "productosnl.asp?nl=05&TM=CO",
+    "category_nl": "05",
+    "category_url": "https://www.lagallega.com.ar/productosnl.asp?pg=1&nl=05000000"
+  },
+  {
+    "category": "desayuno y merienda",
+    "full_attribute": "productosnl.asp?nl=06&TM=CO",
+    "category_nl": "06",
+    "category_url": "https://www.lagallega.com.ar/productosnl.asp?pg=1&nl=06000000"
+  },
+  {
+    "category": "bebidas",
+    "full_attribute": "productosnl.asp?nl=07&TM=CO",
+    "category_nl": "07",
+    "category_url": "https://www.lagallega.com.ar/productosnl.asp?pg=1&nl=07000000"
+  },
+  {
+    "category": "lacteos y frescos",
+    "full_attribute": "productosnl.asp?nl=08&TM=CO",
+    "category_nl": "08",
+    "category_url": "https://www.lagallega.com.ar/productosnl.asp?pg=1&nl=08000000"
+  },
+  {
+    "category": "cumpleaños",
+    "full_attribute": "productosnl.asp?nl=09&TM=CO",
+    "category_nl": "09",
+    "category_url": "https://www.lagallega.com.ar/productosnl.asp?pg=1&nl=09000000"
+  },
+  {
+    "category": "libreria",
+    "full_attribute": "productosnl.asp?nl=10&TM=CO",
+    "category_nl": "10",
+    "category_url": "https://www.lagallega.com.ar/productosnl.asp?pg=1&nl=10000000"
+  },
+  {
+    "category": "jugueteria",
+    "full_attribute": "productosnl.asp?nl=11&TM=CO",
+    "category_nl": "11",
+    "category_url": "https://www.lagallega.com.ar/productosnl.asp?pg=1&nl=11000000"
+  },
+  {
+    "category": "velas y esencias",
+    "full_attribute": "productosnl.asp?nl=12&TM=CO",
+    "category_nl": "12",
+    "category_url": "https://www.lagallega.com.ar/productosnl.asp?pg=1&nl=12000000"
+  },
+  {
+    "category": "carniceria",
+    "full_attribute": "productosnl.asp?nl=13&TM=CO",
+    "category_nl": "13",
+    "category_url": "https://www.lagallega.com.ar/productosnl.asp?pg=1&nl=13000000"
+  },
+  {
+    "category": "panificados",
+    "full_attribute": "productosnl.asp?nl=14&TM=CO",
+    "category_nl": "14",
+    "category_url": "https://www.lagallega.com.ar/productosnl.asp?pg=1&nl=14000000"
+  },
+  {
+    "category": "congelados",
+    "full_attribute": "productosnl.asp?nl=15&TM=CO",
+    "category_nl": "15",
+    "category_url": "https://www.lagallega.com.ar/productosnl.asp?pg=1&nl=15000000"
+  },
+  {
+    "category": "limpieza",
+    "full_attribute": "productosnl.asp?nl=16&TM=CO",
+    "category_nl": "16",
+    "category_url": "https://www.lagallega.com.ar/productosnl.asp?pg=1&nl=16000000"
+  },
+  {
+    "category": "mundo bebé",
+    "full_attribute": "productosnl.asp?nl=17&TM=CO",
+    "category_nl": "17",
+    "category_url": "https://www.lagallega.com.ar/productosnl.asp?pg=1&nl=17000000"
+  },
+  {
+    "category": "mascotas",
+    "full_attribute": "productosnl.asp?nl=18&TM=CO",
+    "category_nl": "18",
+    "category_url": "https://www.lagallega.com.ar/productosnl.asp?pg=1&nl=18000000"
+  },
+  {
+    "category": "frutas y verduras",
+    "full_attribute": "productosnl.asp?nl=19&TM=CO",
+    "category_nl": "19",
+    "category_url": "https://www.lagallega.com.ar/productosnl.asp?pg=1&nl=19000000"
+  },
+  {
+    "category": "perfumeria",
+    "full_attribute": "productosnl.asp?nl=20&TM=CO",
+    "category_nl": "20",
+    "category_url": "https://www.lagallega.com.ar/productosnl.asp?pg=1&nl=20000000"
+  },
+  {
+    "category": "fiestas",
+    "full_attribute": "productosnl.asp?nl=02&TM=CO",
+    "category_nl": "02",
+    "category_url": "https://www.lagallega.com.ar/productosnl.asp?pg=1&nl=02000000"
+  },
+  {
+    "category": "pascuas",
+    "full_attribute": "productosnl.asp?nl=21&TM=CO",
+    "category_nl": "21",
+    "category_url": "https://www.lagallega.com.ar/productosnl.asp?pg=1&nl=21000000"
+  }
+]
