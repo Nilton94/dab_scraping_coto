@@ -1,0 +1,92 @@
+targets:
+  # dev:
+  #   resources:
+  #     jobs:
+  #       scraping_lagallega_job:
+  #         parameters:
+  #           - name: catalog
+  #             default: lagallega_${bundle.target}
+
+  prod:
+    resources:
+      jobs:
+        scraping_lagallega_job:
+          parameters:
+            - name: catalog
+              default: lagallega
+          schedule:
+            quartz_cron_expression: "0 0 9 * * ?"
+            timezone_id: "America/Sao_Paulo"
+            pause_status: "UNPAUSED"
+
+
+resources:
+  jobs:
+    scraping_lagallega_job:
+      name: scraping_lagallega_job
+
+      email_notifications:
+       on_failure:
+        - ${workspace.current_user.userName}        
+      
+      parameters: 
+        - name: target
+          default: ${bundle.target}
+        - name: source_path
+          default: ${workspace.file_path}/src
+        - name: tables_to_process
+          default: "products"
+
+      performance_target: PERFORMANCE_OPTIMIZED
+      
+      tasks:
+        - task_key: validate_volumes
+          description: "Valida se os volumes e catálogos existem"
+          notebook_task:
+            notebook_path: ../../src/scraping_lagallega/tasks/00_check_volumes.ipynb
+
+        - task_key: load_staging_data
+          description: "Carrega dados na staging"
+          depends_on:
+            - task_key: validate_volumes
+          spark_python_task:
+            python_file: ../../src/scraping_lagallega/tasks/01_loading_staging.py
+          environment_key: scraping_lagallega_serverless_environment
+
+        - task_key: load_bronze_data
+          description: "Carrega dados na camada bronze"
+          depends_on:
+            - task_key: load_staging_data
+          notebook_task:
+            notebook_path: ../../src/scraping_lagallega/tasks/02_staging_to_bronze.ipynb
+            base_parameters:
+              type: products
+              catalog: lagallega
+              schema: bronze
+              table: products
+              volume: staging
+              file_format: json
+          environment_key: scraping_lagallega_serverless_environment
+        
+        - task_key: load_silver_data
+          description: "Carrega dados na camada silver"
+          depends_on:
+            - task_key: load_bronze_data
+          notebook_task:
+            notebook_path: ../../src/scraping_lagallega/tasks/03_bronze_to_silver.ipynb
+            base_parameters:
+              source_catalog: lagallega
+              source_schema: bronze
+              source_table: products
+              target_catalog: lagallega
+              target_schema: silver
+              target_tables: '["products", "categories"]'
+              partition_by: '["dt"]'
+              options: '{"delta.columnMapping.mode": "name"}'
+          environment_key: scraping_lagallega_serverless_environment
+
+      environments:
+        - environment_key: scraping_lagallega_serverless_environment
+          spec:
+            environment_version: "4"
+            dependencies: ${var.scraping_lagallega_job_serverless_libraries}

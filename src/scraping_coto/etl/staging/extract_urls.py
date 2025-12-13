@@ -6,8 +6,8 @@ import datetime, pytz
 import polars as pl
 import polars.selectors as cs
 from dataclasses import dataclass
-from ...utils.literals import URLTYPE
-from ...utils.logger import get_logger
+from modules.utils.literals import URLTYPE
+from modules.utils.logger import get_logger
 
 logger = get_logger()
 

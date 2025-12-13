@@ -1,5 +1,5 @@
 from pyspark.sql.functions import col, from_utc_timestamp, from_unixtime, when
-from scraping_coto.utils.logger import get_logger
+from modules.utils.logger import get_logger
 
 logger = get_logger(__name__)
 

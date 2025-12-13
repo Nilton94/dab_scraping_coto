@@ -1,0 +1,38 @@
+# # The main pipeline for scraping_coto
+# # O pipeline contem as tasks a serem executadas no Databricks DLT (Delta Live Tables)
+# targets:
+#   dev: 
+#     resources:
+#       pipelines:
+#         scraping_coto_pipeline:
+#           continuous: false
+#           catalog: coto_${bundle.target}
+#           schema: scraping_coto_${bundle.target}
+#           serverless: true
+
+#   prod:
+#     resources:
+#       pipelines:
+#         scraping_coto_pipeline:
+#           continuous: false
+#           catalog: coto_${bundle.target}
+#           schema: scraping_coto_${bundle.target}
+#           serverless: true
+  
+
+# resources:
+#   pipelines:
+#     scraping_coto_pipeline:
+#       name: scraping_coto_pipeline
+#       catalog: coto_${bundle.target}
+#       schema: scraping_coto_${bundle.target}
+#       serverless: true
+#       libraries:
+#         - notebook:
+#             path: ../../src/scraping_coto/03_bronze_to_silver.ipynb
+
+#       configuration:
+#         bundle.sourcePath: ${workspace.file_path}/src
+#         bundle.target: ${bundle.target}
+      
+      
